@@ -10,12 +10,14 @@ from EmployeeApp.models import Employees, Departments
 
 
 def department_api(request):
-    print(dir(request))
+    # print(dir(request))
     if request.method == 'GET':
-        employee = Employees.objects.all()
-        print(employee)
+        data = json.loads(request.body)
+        emp = Employees.objects.filter(department_id=data.get('department')).values()
+        # employee = Employees.objects.all()
+        print(emp)
 
-        count = employee.count()
+        count = emp.count()
         if count == 0:
             return JsonResponse({'message': 'data not found'})
 
