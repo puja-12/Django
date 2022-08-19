@@ -1,47 +1,54 @@
-from django.shortcuts import render
+from django.contrib.auth.models import User
+from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 import json
-from rest_framework.parsers import JSONParser
 
-from EmployeeApp.models import Departments
+from EmployeeApp.models import Employees, Departments
 
 
 # Create your views here.
 
 
 def department_api(request):
-    # print(dir(request))
+    print(dir(request))
     if request.method == 'GET':
-        departments = Departments.objects.all()
-        print(departments)
-        count = departments.count()
+        employee = Employees.objects.all()
+        print(employee)
+
+        count = employee.count()
         if count == 0:
             return JsonResponse({'message': 'data not found'})
 
         return JsonResponse({'message': f'{count} data found'})
 
     elif request.method == 'POST':
-        data = json.loads(request.body)
-        department = Departments.objects.create(department_name=data.get('name'))
-        print(department)
 
-        # return JsonResponse("Added Successfully")
+        data = json.loads(request.body)
+
+        emp = Employees.objects.create(user_id=data.get('user'), emp_name=data.get('emp_name'), age=data.get('age'),
+                                       department_id=data.get('department'))
+
+        print(emp)
+
         return JsonResponse({'message': 'added successfully'})
     elif request.method == 'PUT':
         data = json.loads(request.body)
-        department = Departments.objects.get(id=data.get('key_id'))
-        print(department)
-        if not department:
+        emp = Employees.objects.get(user_id=data.get('user'))
+        print(emp)
+        if not emp:
             return JsonResponse({'message': 'data not found'})
 
-        department.department_name = data.get('name')
-        department.save()
+        emp.emp_name = data.get('emp_name')
+        emp.age = data.get('age')
+        emp.department_id = data.get('department')
+
+        emp.save()
 
         return JsonResponse({'message': 'updated successfully'})
 
     elif request.method == 'DELETE':
         data = json.loads(request.body)
-        department = Departments.objects.get(id=data.get('key_id'))
+        department = Employees.objects.get(user_id=data.get('user'))
         print(department)
         if not department:
             return JsonResponse({'message': 'data not found'})
@@ -49,3 +56,11 @@ def department_api(request):
         department.delete()
         return JsonResponse({'message': 'delete successfully'})
 
+
+
+def user_api(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = User.objects.create_user(**data)
+        return JsonResponse({'message': f"{user.username} is created"})
+    return JsonResponse({'message': "method not allowed"})
