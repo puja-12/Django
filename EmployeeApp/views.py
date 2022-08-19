@@ -13,7 +13,7 @@ def department_api(request):
     # print(dir(request))
     if request.method == 'GET':
         data = json.loads(request.body)
-        emp = Employees.objects.filter(department_id=data.get('department')).values()
+        emp = Employees.objects.filter(user_id=data.get('user')).values()
         # employee = Employees.objects.all()
         print(emp)
 
